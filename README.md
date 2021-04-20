@@ -16,7 +16,8 @@ $ sh -c "$(curl -fsSL https://raw.github.com/antfu/1990-script/master/index.sh)"
 
 Enter you Github username and you are done :)
 
-# Explanation:
+## Explanations
+
 This project works on the way `git` records commit. Whenever you commit something, `git` puts an `Unix Timestamp` on it to record when you committed it. An [`Unix Timestamp`](https://www.unixtimestamp.com/) is the way computers store the current time. An `Unix timestamp` is a `32-bit` number which stores the number of seconds that has passed from January 1st, 1970 at UTC, the `Unix Epoch`.
 
 The script firstly creates a directory with the name of the wanted year - `line 9` `mkdir $YEAR`
