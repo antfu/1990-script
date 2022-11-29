@@ -2,13 +2,43 @@
 
 _() {
   YEAR="1990"
-  echo "GitHub Username: "
-  read -r USERNAME
-  echo "GitHub Access token: "
-  read -r ACCESS_TOKEN
+  tabs 3
+  echo
+  printf "\tStep 0: \e]8;;https://github.com/new\e\\Create a new repo named 1990. (Ctrl/CMD + Click)\e]8;;\e\\ \n"
+  echo
+  echo "\tStep 1: Pick your preferred git login method"
+  echo
+  PS3="Please enter 1 or 2: "
+  options=("HTTPS (GitHub Access Token)" "SSH")
+  select opt in "${options[@]}"
+  do
+      case $opt in
+          "HTTPS (GitHub Access Token)")
+              echo
+              printf "\tStep 2: \e]8;;https://github.com/settings/tokens/new\e\\Generate a personal access token (Ctrl/CMD + Click)\e]8;;\e\\ \n"
+              echo "Copy and paste it below: "
+              read -r ACCESS_TOKEN
+              [ -z "$ACCESS_TOKEN" ] && exit 1
+              echo
+              echo "\tStep 3: Please enter your GitHub username: "
+              read -r USERNAME
+              [ -z "$USERNAME" ] && exit 1
+              echo
+              break
+              ;;
+          "SSH")
+              echo
+              echo "\tStep 2: Copy the SSH link to your repo and paste it below"
+              read -r REPO_LINK
+              [ -z "$REPO_LINK" ] && exit 1
+              USERNAME=${REPO_LINK%/*} # remove suffix after "/"
+              USERNAME=${USERNAME#*:} # remove prefix before ":"
+              break
+              ;;
+          *) echo "invalid option $REPLY, please enter 1 or 2";;
+      esac
+  done
 
-  [ -z "$USERNAME" ] && exit 1
-  [ -z "$ACCESS_TOKEN" ] && exit 1  
   [ ! -d $YEAR ] && mkdir $YEAR
 
   cd "${YEAR}" || exit
@@ -19,7 +49,9 @@ _() {
   GIT_AUTHOR_DATE="${YEAR}-01-01T18:00:00" \
     GIT_COMMITTER_DATE="${YEAR}-01-01T18:00:00" \
     git commit -m "${YEAR}"
-  git remote add origin "https://${ACCESS_TOKEN}@github.com/${USERNAME}/${YEAR}.git"
+    [ -z "$REPO_LINK" ] && \
+      git remote add origin "https://${ACCESS_TOKEN}@github.com/${USERNAME}/${YEAR}.git" || \
+        git remote add origin "${REPO_LINK}"
   git branch -M main
   git push -u origin main -f
   cd ..
